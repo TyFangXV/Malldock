@@ -1,6 +1,7 @@
 import { Scene } from "babylonjs";
 import * as BABYLON from 'babylonjs'
 import "@babylonjs/loaders/glTF"
+import Controller from "../scripts/controllable";
 
 interface ExternalMesh {
     name:string;
@@ -14,12 +15,13 @@ class Actor {
     readonly scene:Scene;
     readonly defaultModel:boolean;
     readonly name:string;
+    
 
     cordinates:Array<number> = [0, 1, 0]
     ExternalMesh?:ExternalMesh;
 
     private mesh:BABYLON.Mesh;
-
+    private InputManager:Controller;
 
     constructor(scene:Scene, defaultModel:boolean, name:string, externalMesh?:ExternalMesh) {
         this.scene = scene;
@@ -27,9 +29,14 @@ class Actor {
         this.name = name;
 
         this.ExternalMesh = externalMesh;
+        //keyboard input handler
+        this.InputManager = new Controller(scene);
+
+        this.InputLoopLogin();
 
         const mesh = this.intialize();
         this.mesh = mesh;
+        
     }
 
     //This functions is responsible of executing all the functions needed to show this actor
@@ -37,6 +44,7 @@ class Actor {
         const mesh = this.createMesh();
         return mesh
     }
+
 
 
     private createMesh():BABYLON.Mesh {
@@ -69,12 +77,17 @@ class Actor {
         this.UpdatePositionOfMesh();
     }
 
+    
+
 
     //private utility function
     private UpdatePositionOfMesh() {
         this.mesh.setPositionWithLocalVector(new BABYLON.Vector3(this.cordinates[0], this.cordinates[1], this.cordinates[2]));
     }
 
+   private InputLoopLogin(){
+    this.InputManager.addKeyEvent(BABYLON.KeyboardEventTypes.KEYDOWN, () => this.setY(this.cordinates[1] + 1))
+   }
 }
 
 export default Actor;
